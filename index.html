@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Proyectos · Dr. Antonio Salazar Campos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f8fafd;
+      --surface: #ffffff;
+      --border: #e0e7ef;
+      --ink: #202124;
+      --muted: #5f6368;
+      --blue: #1a73e8;
+      --blue-soft: #e8f0fe;
+      --teal: #00897b;
+      --red: #d93025;
+      --orange: #f9ab00;
+      --purple: #7c4dff;
+      --green: #1e8e3e;
+      --radius: 12px;
+      --shadow-card: 0 1px 3px rgba(60,64,67,.15), 0 1px 2px rgba(60,64,67,.10);
+      --shadow-hover: 0 4px 12px rgba(60,64,67,.20), 0 2px 6px rgba(60,64,67,.14);
+    }
+
+    body {
+      font-family: 'Roboto', 'Google Sans', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 40;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 20px; height: 64px;
+    }
+    .logo-area { display: flex; align-items: center; gap: 10px; min-width: 200px; }
+    .monogram {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg,#071a3d,#1a73e8);
+      color: #fff; font-weight: 700; font-size: 15px;
+      display: grid; place-items: center; font-family: 'Google Sans', sans-serif;
+      flex-shrink: 0;
+    }
+    .logo-text { font-family: 'Google Sans', sans-serif; font-size: 18px; color: var(--ink); letter-spacing: -.01em; }
+    .logo-text span { color: var(--blue); }
+
+    .searchbar {
+      flex: 1; max-width: 680px; margin: 0 auto;
+      background: #f1f3f4; border-radius: 24px;
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 16px; height: 46px;
+      transition: background .15s, box-shadow .15s;
+    }
+    .searchbar:focus-within {
+      background: var(--surface);
+      box-shadow: 0 1px 6px rgba(32,33,36,.28);
+    }
+    .searchbar svg { flex-shrink: 0; color: var(--muted); }
+    .searchbar input {
+      border: none; outline: none; background: transparent;
+      font-size: 16px; font-family: inherit; color: var(--ink); width: 100%;
+    }
+    .searchbar input::placeholder { color: #9aa0a6; }
+
+    .top-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .icon-btn {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: grid; place-items: center; border: none;
+      background: none; cursor: pointer; color: var(--muted);
+      transition: background .15s;
+    }
+    .icon-btn:hover { background: #f1f3f4; }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg,#dbeafe,#e8f0fe);
+      border: 2px solid var(--border);
+      display: grid; place-items: center; font-size: 14px;
+    }
+
+    /* ── CHIPS / FILTER ── */
+    .filter-bar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 24px 10px; overflow-x: auto; scrollbar-width: none;
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+    .chip {
+      white-space: nowrap; padding: 8px 18px; border-radius: 20px;
+      font-size: 14px; font-family: 'Google Sans', sans-serif; font-weight: 500;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--muted); cursor: pointer; transition: all .15s;
+    }
+    .chip:hover { background: var(--blue-soft); border-color: #bfd1f7; color: var(--blue); }
+    .chip.active { background: var(--blue-soft); border-color: #aecbfa; color: var(--blue); font-weight: 700; }
+
+    /* ── GRID ── */
+    .grid-wrap {
+      padding: 8px 20px 48px;
+      max-width: 1440px; margin: 0 auto;
+    }
+    .results-label {
+      font-size: 13px; color: var(--muted); margin-bottom: 16px; padding-left: 4px;
+    }
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      transition: box-shadow .18s, transform .18s;
+      cursor: pointer;
+    }
+    .card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+
+    .card-thumb {
+      height: 148px; position: relative; overflow: hidden;
+      flex-shrink: 0;
+    }
+    .card-thumb svg { width: 100%; height: 100%; display: block; }
+
+    /* type badge top-left of thumb */
+    .type-badge {
+      position: absolute; top: 10px; left: 10px;
+      background: rgba(0,0,0,.44); color: #fff;
+      font-size: 11px; font-weight: 600; font-family: 'Google Sans', sans-serif;
+      padding: 4px 9px; border-radius: 20px;
+      backdrop-filter: blur(4px);
+    }
+
+    /* open icon top-right */
+    .open-btn {
+      position: absolute; top: 8px; right: 8px;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(255,255,255,.20); border: none;
+      display: grid; place-items: center; color: #fff;
+      cursor: pointer; opacity: 0; transition: opacity .15s, background .15s;
+      text-decoration: none;
+    }
+    .card:hover .open-btn { opacity: 1; }
+    .open-btn:hover { background: rgba(255,255,255,.35); }
+
+    .card-body { padding: 14px 16px 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .card-title {
+      font-family: 'Google Sans', sans-serif; font-size: 15px; font-weight: 600;
+      color: var(--ink); line-height: 1.3;
+    }
+    .card-desc { font-size: 13px; color: var(--muted); line-height: 1.45; flex: 1; }
+    .card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 10px;
+    }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag {
+      font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px;
+      font-family: 'Google Sans', sans-serif;
+    }
+    .tag-datos   { background: #e8f0fe; color: #1a73e8; }
+    .tag-mapas   { background: #e6f4ea; color: #1e8e3e; }
+    .tag-estrategia { background: #fce8e6; color: #d93025; }
+    .tag-fullstack  { background: #f3e8fd; color: #7c4dff; }
+
+    .card-link {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 13px; font-weight: 500; color: var(--blue);
+      text-decoration: none; padding: 5px 2px; border-radius: 6px;
+      font-family: 'Google Sans', sans-serif;
+      transition: color .12s;
+      white-space: nowrap;
+    }
+    .card-link:hover { color: #1557b0; text-decoration: underline; }
+
+    /* no-link state */
+    .no-link { font-size: 12px; color: #bdc1c6; font-style: italic; }
+
+    /* ── EMPTY STATE ── */
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center; padding: 60px 20px;
+      color: var(--muted);
+    }
+    .empty svg { opacity: .35; margin-bottom: 16px; }
+    .empty p { font-size: 16px; }
+
+    /* ── FOOTER ── */
+    .page-footer {
+      border-top: 1px solid var(--border);
+      padding: 18px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px; color: var(--muted);
+    }
+    .page-footer a { color: var(--blue); text-decoration: none; }
+    .page-footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      .topbar { padding: 0 12px; }
+      .logo-text { display: none; }
+      .grid-wrap { padding: 8px 12px 40px; }
+      .filter-bar { padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo-area">
+    <div class="monogram">AS</div>
+    <span class="logo-text">Proyectos<span>.</span></span>
+  </div>
+
+  <div class="searchbar">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+    </svg>
+    <input id="search" type="search" placeholder="Buscar proyectos…" autocomplete="off"/>
+  </div>
+
+  <div class="top-right">
+    <button class="icon-btn" title="Vista lista" id="toggleView">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+    </button>
+    <div class="avatar">👤</div>
+  </div>
+</header>
+
+<!-- FILTER CHIPS -->
+<div class="filter-bar" role="group" aria-label="Filtros">
+  <button class="chip active" data-filter="all">Todos</button>
+  <button class="chip" data-filter="datos">📊 Datos</button>
+  <button class="chip" data-filter="mapas">🗺 Mapas</button>
+  <button class="chip" data-filter="estrategia">📐 Estrategia</button>
+  <button class="chip" data-filter="fullstack">⚙ Full stack</button>
+</div>
+
+<!-- GRID -->
+<main class="grid-wrap">
+  <p class="results-label" id="countLabel">8 proyectos</p>
+  <div class="project-grid" id="grid">
+
+    <!-- 1 -->
+    <article class="card" data-type="datos estrategia" data-title="ICCEM · Competitividad municipal" data-desc="Indicadores, ranking territorial y visualización interactiva.">
+      <div class="card-thumb">
+        <svg viewBox="0 0 360 148"><rect width="360" height="148" fill="#08224d"/>
+          <circle cx="80" cy="74" r="50" fill="none" stroke="#52ffe2" stroke-width="1.5"/>
+          <path d="M80 24 L124 78 L58 118 L34 60 Z" fill="rgba(82,255,226,.15)" stroke="#52ffe2" stroke-width="1.5"/>
+          <polyline points="180,112 210,84 240,92 266,48 294,62 338,22" fill="none" stroke="#f9ab00" stroke-width="3.5"/>
+          <circle cx="338" cy="22" r="4" fill="#f9ab00"/>
+          <line x1="180" x2="180" y1="30" y2="118" stroke="rgba(82,255,226,.2)" stroke-width="1"/>
+          <line x1="338" x2="338" y1="30" y2="118" stroke="rgba(82,255,226,.2)" stroke-width="1"/>
+        </svg>
+        <span class="type-badge">Datos · Estrategia</span>
+        <a class="open-btn" href="https://antonioemsac.github.io/Indice-de-Competitividad-Economica-Municipal-Istmo-de-Tehuantepec-Oaxaca/" target="_blank" rel="noopener" title="Abrir proyecto" onclick="event.stopPropagation()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="card-title">ICCEM · Competitividad municipal</div>
+        <div class="card-desc">Índice de competitividad económica municipal con ranking territorial, ACP y visualización interactiva para los 46 municipios del Istmo.</div>
+        <div class="card-footer">
+          <div class="tags"><span class="tag tag-datos">Datos</span><span class="tag tag-estrategia">Estrategia</span></div>
+          <a class="card-link" href="https://antonioemsac.github.io/Indice-de-Competitividad-Economica-Municipal-Istmo-de-Tehuantepec-Oaxaca/" target="_blank" rel="noopener" onclick="event.stopPropagation()">
+            Abrir
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+      </div>
+    </article>
+
+    <!-- 2 -->
+    <article class="card" data-type="mapas datos" data-title="ICCEM · Capacidades Productivas" data-desc="Capacidades, sectores, rutas estratégicas y reconversión.">
+      <div class="card-thumb">
+        <svg viewBox="0 0 360 148"><rect width="360" height="148" fill="#0b2b60"/>
+          <g fill="#52ffe2" opacity=".65">
+            <circle cx="55" cy="90" r="22"/><circle cx="98" cy="72" r="25"/>
+            <circle cx="145" cy="86" r="30"/><circle cx="192" cy="60" r="24"/>
+            <circle cx="240" cy="82" r="32"/><circle cx="295" cy="66" r="24"/>
+          </g>
+          <g fill="none" stroke="rgba(255,255,255,.12)" stroke-width="1">
+            <line x1="55" y1="90" x2="98" y2="72"/><line x1="98" y1="72" x2="145" y2="86"/>
+            <line x1="145" y1="86" x2="192" y2="60"/><line x1="192" y1="60" x2="240" y2="82"/>
+            <line x1="240" y1="82" x2="295" y2="66"/>
+          </g>
+        </svg>
+        <span class="type-badge">Mapas · Datos</span>
+        <a class="open-btn" href="https://antonioemsac.github.io/mapa-capacidades-iccem/" target="_blank" rel="noopener" title="Abrir proyecto" onclick="event.stopPropagation()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="card-title">ICCEM · Capacidades Productivas</div>
+        <div class="card-desc">Mapa de capacidades productivas municipales: sectores, rutas estratégicas de reconversión y potencial de encadenamientos.</div>
+        <div class="card-footer">
+          <div class="tags"><span class="tag tag-mapas">Mapas</span><span class="tag tag-datos">Datos</span></div>
+          <a class="card-link" href="https://antonioemsac.github.io/mapa-capacidades-iccem/" target="_blank" rel="noopener" onclick="event.stopPropagation()">
+            Abrir
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+      </div>
+    </article>
+
+    <!-- 3 -->
+    <article class="card" data-type="mapas estrategia" data-title="Mapa interactivo de riesgos" data-desc="Riesgos territoriales, capas, ranking y lectura ejecutiva.">
+      <div class="card-thumb">
+        <svg viewBox="0 0 360 148">
+          <defs>
+            <radialGradient id="rg1" cx="42%" cy="50%"><stop offset="0" stop-color="#d93025"/><stop offset=".55" stop-color="#f9ab00"/><stop offset="1" stop-color="#1a73e8"/></radialGradient>
+          </defs>
+          <rect width="360" height="148" fill="#08224d"/>
+          <circle cx="168" cy="74" r="70" fill="url(#rg1)" opacity=".88"/>
+          <circle cx="100" cy="58" r="30" fill="#d93025" opacity=".75"/>
+          <circle cx="220" cy="96" r="20" fill="#f9ab00" opacity=".8"/>
+          <g fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1">
+            <circle cx="168" cy="74" r="85"/><circle cx="168" cy="74" r="55"/>
+          </g>
+        </svg>
+        <span class="type-badge">Mapas · Estrategia</span>
+        <a class="open-btn" href="https://antonioemsac.github.io/Mapa-Interactivo-de-Riesgos-del-Istmo-de-Tehuantepec/" target="_blank" rel="noopener" title="Abrir proyecto" onclick="event.stopPropagation()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Mapa Interactivo de Riesgos del Istmo</div>
+        <div class="card-desc">Riesgos territoriales multicapa con ranking de vulnerabilidad climática, geotérmica y socioeconómica para la región del Istmo de Tehuantepec.</div>
+        <div class="card-footer">
+          <div class="tags"><span class="tag tag-mapas">Mapas</span><span class="tag tag-estrategia">Estrategia</span></div>
+          <a class="card-link" href="https://antonioemsac.github.io/Mapa-Interactivo-de-Riesgos-del-Istmo-de-Tehuantepec/" target="_blank" rel="noopener" onclick="event.stopPropagation()">
+            Abrir
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+      </div>
+    </article>
+
+    <!-- 4 -->
+    <article class="card" data-type="datos estrategia" data-title="Potencial Económico Municipal" data-desc="Mapa de inversión, radar sectorial y matriz estratégica.">
+      <div class="card-thumb">
+        <svg viewBox="0 0 360 148"><rect width="360" height="148" fill="#071a3d"/>
+          <rect x="28" y="88" width="28" height="44" fill="#52ffe2"/>
+          <rect x="72" y="62" width="28" height="70" fill="#1a73e8"/>
+          <rect x="116" y="36" width="28" height="96" fill="#f9ab00"/>
+          <rect x="160" y="52" width="28" height="80" fill="#52ffe2" opacity=".7"/>
+          <rect x="204" y="20" width="28" height="112" fill="#d93025" opacity=".8"/>
+          <circle cx="288" cy="76" r="48" fill="none" stroke="#52ffe2" stroke-width="14" stroke-dasharray="130 80" opacity=".85"/>
+          <circle cx="288" cy="76" r="28" fill="none" stroke="#f9ab00" stroke-width="6" stroke-dasharray="60 40" opacity=".7"/>
+        </svg>
+        <span class="type-badge">Datos · Estrategia</span>
+        <a class="open-btn" href="https://antonioemsac.github.io/Inversi-n-municipal-Istmo-de-Tehuantepec/" target="_blank" rel="noopener" title="Abrir proyecto" onclick="event.stopPropagation()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Potencial Económico Municipal · Istmo</div>
+        <div class="card-desc">Mapa de inversión municipal con radar sectorial, matriz estratégica y análisis de oportunidades para los municipios del CIIT.</div>
+        <div class="card-footer">
+          <div class="tags"><span class="tag tag-datos">Datos</span><span class="tag tag-estrategia">Estrategia</span></div>
+          <a class="card-link" href="https://antonioemsac.github.io/Inversi-n-municipal-Istmo-de-Tehuantepec/" target="_blank" rel="noopener" onclick="event.stopPropagation()">
+            Abrir
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+      </div>
+    </article>
+
+    <!-- 5 -->
+    <article class="card" data-type="datos estrategia mapas" data-title="Simulador de Localización Estratégica" data-desc="Modelo multicriterio para priorizar municipios y sectores.">
+      <div class="card-thumb">
+        <svg viewBox="0 0 360 148"><rect width="360" height="148" fill="#08224d"/>
+          <g stroke="#52ffe2" stroke-width="1.5" opacity=".55">
+            <path d="M30 108 L95 52 L162 88 L234 42 L315 108"/>
+            <path d="M50 32 L112 122 L188 28 L268 112"/>
+          </g>
+          <g fill="#f9ab00">
+            <circle cx="95" cy="52" r="8"/><circle cx="234" cy="42" r="8"/><circle cx="162" cy="88" r="8"/>
+          </g>
+          <g fill="#52ffe2" opacity=".6">
+            <circle cx="30" cy="108" r="5"/><circle cx="315" cy="108" r="5"/>
+          </g>
+          <!-- grid lines -->
+          <g stroke="rgba(82,255,226,.1)" stroke-width="1">
+            <line x1="0" x2="360" y1="37" y2="37"/>
+            <line x1="0" x2="360" y1="74" y2="74"/>
+            <line x1="0" x2="360" y1="111" y2="111"/>
+          </g>
+        </svg>
+        <span class="type-badge">Datos · Mapas · Estrategia</span>
+        <a class="open-btn" href="https://antonioemsac.github.io/simulador-de-inversi-n_istmo-de-tehuantepec/" target="_blank" rel="noopener" title="Abrir proyecto" onclick="event.stopPropagation()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Simulador de Localización Estratégica · Horizonte</div>
+        <div class="card-desc">Modelo multicriterio interactivo para priorizar municipios y sectores de inversión según variables territoriales del Istmo de Tehuantepec.</div>
+        <div class="card-footer">
+          <div class="tags"><span class="tag tag-datos">Datos</span><span class="tag tag-mapas">Mapas</span><span class="tag tag-estrategia">Estrategia</span></div>
+          <a class="card-link" href="https://antonioemsac.github.io/simulador-de-inversi-n_istmo-de-tehuantepec/" target="_blank" rel="noopener" onclick="event.stopPropagation()">
+            Abrir
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+      </div>
+    </article>
+
+    <!-- 6 -->
+    <article class="card" data-type="mapas datos" data-title="Observatorio Geotérmico CIIT" data-desc="Clima, vulnerabilidad, interpolación y visualización territorial.">
+      <div class="card-thumb">
+        <svg viewBox="0 0 360 148">
+          <defs>
+            <linearGradient id="geo" x1="0" x2="1"><stop stop-color="#22c55e"/><stop offset=".45" stop-color="#f9ab00"/><stop offset="1" stop-color="#d93025"/></linearGradient>
+          </defs>
+          <rect width="360" height="148" fill="#0b2b60"/>
+          <path d="M0 108 C68 22 114 148 170 62 S272 38 360 98 V148 H0Z" fill="url(#geo)" opacity=".88"/>
+          <path d="M0 130 C80 90 160 118 240 80 S300 52 360 72" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="2"/>
+          <!-- temp dots -->
+          <circle cx="85" cy="80" r="6" fill="#fff" opacity=".6"/>
+          <circle cx="190" cy="58" r="6" fill="#fff" opacity=".6"/>
+          <circle cx="300" cy="92" r="6" fill="#fff" opacity=".6"/>
+        </svg>
+        <span class="type-badge">Mapas · Datos</span>
+        <a class="open-btn" href="https://antonioemsac.github.io/Dashboard-Istmo-de-Tehuantepec-geotermico/" target="_blank" rel="noopener" title="Abrir proyecto" onclick="event.stopPropagation()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="card-title">CIIT — Observatorio Geotérmico | Istmo</div>
+        <div class="card-desc">Dashboard geotérmico interactivo con interpolación IDW (NASA POWER/T2M_MAX), análisis de vulnerabilidad climática y tipología G1–G5 municipal.</div>
+        <div class="card-footer">
+          <div class="tags"><span class="tag tag-mapas">Mapas</span><span class="tag tag-datos">Datos</span></div>
+          <a class="card-link" href="https://antonioemsac.github.io/Dashboard-Istmo-de-Tehuantepec-geotermico/" target="_blank" rel="noopener" onclick="event.stopPropagation()">
+            Abrir
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+      </div>
+    </article>
+
+    <!-- 7 -->
+    <article class="card" data-type="fullstack datos" data-title="Academia HORIZONTE-CIIT Full Stack" data-desc="Plataforma de cursos, login, evaluaciones y certificados.">
+      <div class="card-thumb">
+        <svg viewBox="0 0 360 148"><rect width="360" height="148" fill="#071a3d"/>
+          <rect x="24" y="24" width="88" height="100" rx="12" fill="#1a73e8"/>
+          <rect x="130" y="24" width="88" height="100" rx="12" fill="#0891b2"/>
+          <rect x="236" y="24" width="88" height="100" rx="12" fill="#7c4dff"/>
+          <path d="M112 74 H130 M218 74 H236" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+          <g fill="rgba(255,255,255,.18)" font-size="9" font-family="monospace">
+            <rect x="36" y="44" width="64" height="4" rx="2"/>
+            <rect x="36" y="56" width="48" height="4" rx="2"/>
+            <rect x="36" y="68" width="56" height="4" rx="2"/>
+            <rect x="36" y="80" width="40" height="4" rx="2"/>
+          </g>
+        </svg>
+        <span class="type-badge">Full stack · Datos</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Academia HORIZONTE-CIIT Full Stack</div>
+        <div class="card-desc">Plataforma educativa con login, microcursos, evaluaciones y certificados digitales orientada a la inteligencia territorial del CIIT.</div>
+        <div class="card-footer">
+          <div class="tags"><span class="tag tag-fullstack">Full stack</span><span class="tag tag-datos">Datos</span></div>
+          <span class="no-link">En desarrollo</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- 8 -->
+    <article class="card" data-type="datos fullstack" data-title="Agente de predicción regional" data-desc="Forecast, modelos, variables regionales y reporte ejecutivo.">
+      <div class="card-thumb">
+        <svg viewBox="0 0 360 148"><rect width="360" height="148" fill="#08224d"/>
+          <path d="M22 100 C80 12 134 130 190 52 S256 36 316 88" fill="none" stroke="#52ffe2" stroke-width="4"/>
+          <path d="M22 120 C82 82 152 114 206 74 S264 42 316 68" fill="none" stroke="#f9ab00" stroke-width="2.5"/>
+          <circle cx="190" cy="52" r="8" fill="#fff"/>
+          <circle cx="316" cy="88" r="5" fill="#52ffe2"/>
+          <!-- forecast zone -->
+          <path d="M260 30 L260 118 L340 118 L340 30Z" fill="rgba(82,255,226,.06)" stroke="rgba(82,255,226,.2)" stroke-width="1" stroke-dasharray="4 3"/>
+        </svg>
+        <span class="type-badge">Datos · Full stack</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Agente de predicción regional</div>
+        <div class="card-desc">Forecast econométrico con modelos de series de tiempo, variables regionales del Istmo y reporte ejecutivo automatizado.</div>
+        <div class="card-footer">
+          <div class="tags"><span class="tag tag-datos">Datos</span><span class="tag tag-fullstack">Full stack</span></div>
+          <span class="no-link">En desarrollo</span>
+        </div>
+      </div>
+    </article>
+
+  </div><!-- /grid -->
+</main>
+
+<!-- FOOTER -->
+<footer class="page-footer">
+  <span>Dr. Antonio Salazar Campos · Istmo de Tehuantepec, Oaxaca</span>
+  <span>✉ <a href="mailto:antoniosalazarcampos@gmail.com">antoniosalazarcampos@gmail.com</a></span>
+</footer>
+
+<script>
+  const cards = [...document.querySelectorAll('.card')];
+  const chips = [...document.querySelectorAll('.chip')];
+  const search = document.getElementById('search');
+  const countLabel = document.getElementById('countLabel');
+  let activeFilter = 'all';
+
+  function updateGrid() {
+    const q = search.value.toLowerCase().trim();
+    let visible = 0;
+    cards.forEach(c => {
+      const types = c.dataset.type || '';
+      const title = (c.dataset.title || '').toLowerCase();
+      const desc  = (c.dataset.desc  || '').toLowerCase();
+      const matchFilter = activeFilter === 'all' || types.includes(activeFilter);
+      const matchSearch = !q || title.includes(q) || desc.includes(q) || types.includes(q);
+      const show = matchFilter && matchSearch;
+      c.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    countLabel.textContent = visible === 1 ? '1 proyecto' : `${visible} proyectos`;
+    // empty state
+    let empty = document.getElementById('emptyState');
+    if (visible === 0) {
+      if (!empty) {
+        empty = document.createElement('div');
+        empty.id = 'emptyState';
+        empty.className = 'empty';
+        empty.innerHTML = `<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><p>Sin resultados para "<b>${search.value}</b>"</p>`;
+        document.getElementById('grid').appendChild(empty);
+      }
+    } else if (empty) empty.remove();
+  }
+
+  chips.forEach(chip => chip.addEventListener('click', () => {
+    chips.forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeFilter = chip.dataset.filter;
+    updateGrid();
+  }));
+
+  search.addEventListener('input', updateGrid);
+
+  // card click → open link if exists
+  cards.forEach(card => {
+    card.addEventListener('click', e => {
+      if (e.target.closest('a')) return;
+      const link = card.querySelector('a.card-link');
+      if (link) window.open(link.href, '_blank', 'noopener');
+    });
+  });
+</script>
+</body>
+</html>
